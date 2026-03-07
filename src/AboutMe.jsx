@@ -3,7 +3,7 @@ function AboutMe({ name , like}){
         <div>
             <h1>About me</h1>
             <p>
-                Hello,my name is {name}, and I like {like}
+                Hello,my name is {name}, and me🐶 like {like}
             </p>
         </div>
     )
