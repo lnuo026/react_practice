@@ -9,3 +9,7 @@
   -moz-osx-font-smoothing: grayscale;
     -webkit-text-size-adjust: 100%;
 }
+ 
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+  }
