@@ -1,6 +1,8 @@
-import articles from "./airticle";
 // import AboutMe from "./AboutMe.jsx";
+import articles from "./airticle";
 import ArticleView from "./ArticleView";
+import styles from './App.module.css';  
+
 
 
 
@@ -8,11 +10,11 @@ import ArticleView from "./ArticleView";
 
  function App() {
   return (
-      <div className="container">
+      <div className={styles.container}>
   
         
       <h1>Articles</h1>
-      <div className="articleContainer">
+      <div className={styles.articleContainer}  >
       {articles && articles.length > 0 ? (
         articles.map((article) => <ArticleView key={article.id} article={article} />)
       ):(
