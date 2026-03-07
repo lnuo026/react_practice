@@ -1,7 +1,7 @@
 /**
  * Contains some dummy article data.
  */
-const articles = [
+const initialArticles = [
   {
     id: 1,
     title: "Pikachu's Electrifying Adventures",
@@ -73,4 +73,4 @@ const articles = [
   }
 ];
 
-export default articles;
+export default initialArticles;

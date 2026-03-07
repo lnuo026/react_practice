@@ -1,27 +1,40 @@
-// import AboutMe from "./AboutMe.jsx";
-import articles from "./airticle";
-import ArticleView from "./ArticleView";
-import styles from './App.module.css';  
+import { useState} from "react";
+import initalArticles from "./initial-article.js";
+import ArticleView from "./ArticleView";  
+import AddArticleComponent from "./AddArticleComponent";
 
 
-
-
-//  const articles = [];
 
  function App() {
+
+  const [articles, setArticles]  = useState(initalArticles);
+
   return (
-      <div className={styles.container}>
-  
-        
+      <div className="container">
       <h1>Articles</h1>
-      <div className={styles.articleContainer}  >
+      <div className="articleContainer ">
       {articles && articles.length > 0 ? (
         articles.map((article) => <ArticleView key={article.id} article={article} />)
       ):(
           <p>There are no article :(</p>
       )}
+
+      <AddArticleComponent 
+      onAddArticle={(title , content) =>{
+        setArticles([
+          {id: articles.length + 1,
+            title,
+            content
+          },
+          ...articles
+        ])
+      }
+    }  
+   />
+
+
       </div>
-      </div>
+    </div>
   );
 }
 
