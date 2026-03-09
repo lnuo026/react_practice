@@ -1,41 +1,15 @@
-import { useState} from "react";
-import initalArticles from "./initial-article.js";
-import ArticleView from "./ArticleView";  
-import AddArticleComponent from "./AddArticleComponent";
+import Counter from "./Counter";
+import Timer from "./Timer";
 
 
-
- function App() {
-
-  const [articles, setArticles]  = useState(initalArticles);
-
+function App(){
   return (
-      <div className="container">
-      <h1>Articles</h1>
-      <div className="articleContainer ">
-      {articles && articles.length > 0 ? (
-        articles.map((article) => <ArticleView key={article.id} article={article} />)
-      ):(
-          <p>There are no article :(</p>
-      )}
-
-      <AddArticleComponent 
-      onAddArticle={(title , content) =>{
-        setArticles([
-          {id: articles.length + 1,
-            title,
-            content
-          },
-          ...articles
-        ])
-      }
-    }  
-   />
-
-
-      </div>
-    </div>
+    <div>
+      <h1>Counter</h1>
+      <Counter/>
+      <h1>Timer</h1>
+      <Timer/>
+  </div>
   );
 }
-
-export default App
+export default App;
