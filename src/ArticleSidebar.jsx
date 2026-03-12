@@ -17,9 +17,9 @@ export default function ArticleSidebar ( {articles}){
 
             <hr />
             
-            <link to="newArticle" className={styles.addNew}> 
+            <Link to="newArticle" className={styles.addNew}> 
 new article
-            </link>
+            </Link>
 
         </div>
     );
