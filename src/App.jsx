@@ -8,8 +8,9 @@ function App(){
     return(
         <div style ={{ margin: "10px" ,padding:"5px" ,border: " 1px solid black "}}>
             <div>
-                <button onClick ={()=> setUser({ username : "Bob"})}> Log in </button>
+                <button onClick ={()=> setUser({ username : "Hammer"})}> Log in </button>
                 <button onClick ={()=> setUser({ undefined})}> Log out </button>
+                <button onClick={() => setUser({ username: " nora " ,age : "1" ,role: "student"})}> anther button </button>
             </div>
 
             < hr />
