@@ -1,12 +1,16 @@
 import { Routes ,Route ,useNavigate , useParams ,Navigate} from "react-router-dom";
 import { useState } from "react"; 
 import initialArticles from "./data";
+import Articleview from "./ArticlesView";
+import  NewArticleForm from "./NewArticleForm";
+import PageWithNavbar from "./PageWithNavbar";
+
 
 
 export default function App(){
   const  [articles , setArticles] = useState(initialArticles);
 
-  const Navigate = useNavigate();
+  const navigate = useNavigate();
 
   function handleAddArticles(title,content){
     const updateArticles = [...articles];
@@ -19,10 +23,19 @@ export default function App(){
     updateArticles.push(newArticle);
     setArticles(updateArticles);
 
-    Navigate(`/aritcles/${newArticle.id}`, { replace: true});
-
-
+    navigate(`/aritcles/${newArticle.id}`, { replace: true});
   }
+
+return (
+  <Routes>
+      <Route path="/" element = {<PageWithNavbar />}>
+      <Route  index element={<Navigate to ="articles" replace />} />
+      
+      <Route path="articles" element={< Arti/>}/>
+      <Route index element={<Navigate to={`${articles[0].id}`} replace/>}/>
+    </Route>
+  </Routes>
+);
     
 
 }
