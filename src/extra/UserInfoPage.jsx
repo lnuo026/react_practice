@@ -1,4 +1,4 @@
-import { AuthContext } from "./auth-context";
+import { AuthContext } from "./extra/auth-context";
 import { useContext } from "react";
 
 export default function UserInfoPage(){
