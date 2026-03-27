@@ -946,3 +946,546 @@ UsersService 把用户存入 MongoDB Atlas
   这个概念叫依赖注入（DI），是后端框架的核心设计
   思想，知道这个意思就够了
 ```
+
+---
+
+## ✅ Sprint 1 + 2 已完成
+
+- Google OAuth 登录
+- NestJS 后端 + MongoDB 全链路
+- 用户数据写入数据库
+
+---
+
+## Sprint 3 — 游戏核心 + UI 重设计
+
+### UI 参考风格
+- **Dashboard** → 参考 Round Tracker Pro：白色背景，彩色渐变统计卡片（浅蓝/浅绿/浅粉/浅黄），recharts 图表
+- **游戏页** → 参考 Bluff Battle：大字体，粗边框卡片，鲜明色彩，Framer Motion 动画
+- **首页/登录** → 居中卡片，渐变背景，入场动画
+
+### 游戏玩法（序列回想）
+```
+1. 屏幕依次闪出数字（1-9），每个显示 800ms + Framer Motion 动画
+2. 全部显示完 → 用户点击 3×3 数字网格输入序列
+3. 全对 → level+1（序列更长）；错误 → level-1
+4. 10 轮结束 → SessionSummary 显示得分/准确率
+```
+
+---
+
+### 第 21 步：后端扩展 GameSession Schema
+
+修改 `backend/src/game/game-sessionSchema.ts`，追加两个字段：
+
+```ts
+@Prop({ default: 0 })
+accuracy: number   // 本局答对率 0-100
+
+@Prop({ default: 0 })
+totalRounds: number  // 本局总轮数
+```
+
+---
+
+### 第 22 步：后端 Game Service 新增 getStats
+
+修改 `backend/src/game/service.ts`，追加方法：
+
+```ts
+async getStats(userId: string) {
+  const sessions = await this.gameModel.find({ userId }).sort({ playedAt: -1 }).limit(20)
+  if (!sessions.length) return { bestLevel: 0, avgAccuracy: 0, totalSessions: 0 }
+  return {
+    bestLevel: Math.max(...sessions.map(s => s.level)),
+    avgAccuracy: Math.round(sessions.reduce((a, s) => a + s.accuracy, 0) / sessions.length),
+    totalSessions: sessions.length,
+    recentSessions: sessions.slice(0, 10),
+  }
+}
+```
+
+修改 `saveSession()` 接收 accuracy 和 totalRounds：
+
+```ts
+async saveSession(data: {
+  userId: string; score: number; level: number;
+  duration: number; accuracy: number; totalRounds: number
+}): Promise<GameSession> {
+  return this.gameModel.create(data)
+}
+```
+
+---
+
+### 第 23 步：后端 Game Controller 新增 /stats 端点
+
+修改 `backend/src/game/controller.ts`，追加：
+
+```ts
+@Get('stats')
+@UseGuards(AuthGuard)
+async getStats(@Req() req) {
+  return this.gameService.getStats(req.user.uid)
+}
+```
+
+修改 `saveSession` body 类型接收新字段：
+
+```ts
+@Body() body: { score: number; level: number; duration: number; accuracy: number; totalRounds: number }
+```
+
+---
+
+### 第 24 步：前端新建 gameStore
+
+新建 `frontend/src/store/gameStore.ts`：
+
+```ts
+import { create } from 'zustand'
+
+type Phase = 'idle' | 'showing' | 'input' | 'feedback' | 'summary'
+
+interface GameState {
+  phase: Phase
+  sequence: number[]
+  userInput: number[]
+  level: number
+  score: number
+  round: number
+  correctRounds: number
+  startGame: () => void
+  setSequence: (seq: number[]) => void
+  addInput: (num: number) => void
+  clearInput: () => void
+  setPhase: (phase: Phase) => void
+  nextRound: (correct: boolean) => void
+  resetGame: () => void
+}
+
+export const useGameStore = create<GameState>((set, get) => ({
+  phase: 'idle',
+  sequence: [],
+  userInput: [],
+  level: 3,
+  score: 0,
+  round: 0,
+  correctRounds: 0,
+
+  startGame: () => set({ phase: 'showing', round: 1, score: 0, correctRounds: 0, level: 3, userInput: [] }),
+  setSequence: (seq) => set({ sequence: seq }),
+  addInput: (num) => set(s => ({ userInput: [...s.userInput, num] })),
+  clearInput: () => set({ userInput: [] }),
+  setPhase: (phase) => set({ phase }),
+  nextRound: (correct) => set(s => ({
+    score: correct ? s.score + s.level * 10 : s.score,
+    correctRounds: correct ? s.correctRounds + 1 : s.correctRounds,
+    level: correct ? Math.min(s.level + 1, 9) : Math.max(s.level - 1, 2),
+    round: s.round + 1,
+    userInput: [],
+    phase: s.round >= 10 ? 'summary' : 'showing',
+  })),
+  resetGame: () => set({ phase: 'idle', sequence: [], userInput: [], level: 3, score: 0, round: 0, correctRounds: 0 }),
+}))
+```
+
+---
+
+### 第 25 步：前端新建游戏组件
+
+**新建 `frontend/src/components/game/SequenceDisplay.tsx`**
+
+用 Framer Motion 依次显示数字，每个数字出现 800ms 后消失：
+
+```tsx
+import { motion, AnimatePresence } from 'framer-motion'
+import { useEffect, useState } from 'react'
+
+interface Props {
+  sequence: number[]
+  onDone: () => void
+}
+
+export default function SequenceDisplay({ sequence, onDone }: Props) {
+  const [index, setIndex] = useState(0)
+
+  useEffect(() => {
+    if (index >= sequence.length) { onDone(); return }
+    const timer = setTimeout(() => setIndex(i => i + 1), 900)
+    return () => clearTimeout(timer)
+  }, [index, sequence, onDone])
+
+  return (
+    <div className="flex items-center justify-center h-48">
+      <AnimatePresence mode="wait">
+        {index < sequence.length && (
+          <motion.div
+            key={index}
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 1.5, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="text-8xl font-bold text-indigo-400"
+          >
+            {sequence[index]}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+```
+
+**新建 `frontend/src/components/game/InputGrid.tsx`**
+
+3×3 数字点击网格：
+
+```tsx
+interface Props {
+  onInput: (num: number) => void
+  userInput: number[]
+  maxLength: number
+}
+
+export default function InputGrid({ onInput, userInput, maxLength }: Props) {
+  return (
+    <div className="grid grid-cols-3 gap-3 w-64 mx-auto">
+      {[1,2,3,4,5,6,7,8,9].map(n => (
+        <button
+          key={n}
+          onClick={() => userInput.length < maxLength && onInput(n)}
+          className="h-16 text-2xl font-bold rounded-xl bg-white/10 hover:bg-indigo-500 border border-white/20 transition-all"
+        >
+          {n}
+        </button>
+      ))}
+    </div>
+  )
+}
+```
+
+**新建 `frontend/src/components/game/SessionSummary.tsx`**
+
+游戏结束总结页，显示得分/准确率，保存到后端：
+
+```tsx
+import { useEffect } from 'react'
+import { apiFetch } from '../../lib/api'
+
+interface Props {
+  score: number
+  correctRounds: number
+  totalRounds: number
+  level: number
+  onRestart: () => void
+}
+
+export default function SessionSummary({ score, correctRounds, totalRounds, level, onRestart }: Props) {
+  const accuracy = Math.round((correctRounds / totalRounds) * 100)
+
+  useEffect(() => {
+    apiFetch('/game/session', {
+      method: 'POST',
+      body: JSON.stringify({ score, level, duration: 0, accuracy, totalRounds }),
+    })
+  }, [])
+
+  return (
+    <div className="text-center space-y-6">
+      <h2 className="text-4xl font-bold text-white">游戏结束</h2>
+      <div className="grid grid-cols-3 gap-4">
+        <div className="bg-blue-100 rounded-2xl p-4">
+          <p className="text-3xl font-bold text-blue-700">{score}</p>
+          <p className="text-sm text-blue-500">得分</p>
+        </div>
+        <div className="bg-green-100 rounded-2xl p-4">
+          <p className="text-3xl font-bold text-green-700">{accuracy}%</p>
+          <p className="text-sm text-green-500">准确率</p>
+        </div>
+        <div className="bg-purple-100 rounded-2xl p-4">
+          <p className="text-3xl font-bold text-purple-700">{level}</p>
+          <p className="text-sm text-purple-500">最终等级</p>
+        </div>
+      </div>
+      <button onClick={onRestart} className="px-8 py-3 bg-indigo-500 text-white rounded-xl font-bold hover:bg-indigo-600">
+        再来一局
+      </button>
+    </div>
+  )
+}
+```
+
+---
+
+### 第 26 步：前端新建 GamePage
+
+新建 `frontend/src/pages/GamePage.tsx`：
+
+```tsx
+import { useEffect, useCallback } from 'react'
+import { useGameStore } from '../store/gameStore'
+import SequenceDisplay from '../components/game/SequenceDisplay'
+import InputGrid from '../components/game/InputGrid'
+import SessionSummary from '../components/game/SessionSummary'
+
+function generateSequence(length: number): number[] {
+  return Array.from({ length }, () => Math.floor(Math.random() * 9) + 1)
+}
+
+export default function GamePage() {
+  const { phase, sequence, userInput, level, score, round, correctRounds,
+          startGame, setSequence, addInput, setPhase, nextRound, resetGame } = useGameStore()
+
+  // 每次进入 showing 阶段，生成新序列
+  useEffect(() => {
+    if (phase === 'showing') setSequence(generateSequence(level))
+  }, [phase, level, round])
+
+  const handleSequenceDone = useCallback(() => setPhase('input'), [])
+
+  const handleInput = useCallback((num: number) => {
+    addInput(num)
+    const newInput = [...userInput, num]
+    if (newInput.length === sequence.length) {
+      const correct = newInput.every((v, i) => v === sequence[i])
+      setPhase('feedback')
+      setTimeout(() => nextRound(correct), 1000)
+    }
+  }, [userInput, sequence])
+
+  return (
+    <div className="min-h-screen bg-[#0a0e1a] flex flex-col items-center justify-center p-6 text-white">
+      {/* 顶部状态栏 */}
+      <div className="flex gap-8 mb-8 text-lg">
+        <span>第 {round}/10 轮</span>
+        <span>等级 {level}</span>
+        <span>得分 {score}</span>
+      </div>
+
+      {phase === 'idle' && (
+        <div className="text-center space-y-6">
+          <h1 className="text-5xl font-bold">序列回想</h1>
+          <p className="text-gray-400">记住数字出现的顺序，然后按顺序点击</p>
+          <button onClick={startGame} className="px-10 py-4 bg-indigo-500 rounded-2xl text-xl font-bold hover:bg-indigo-600">
+            开始游戏
+          </button>
+        </div>
+      )}
+
+      {phase === 'showing' && (
+        <div className="text-center">
+          <p className="text-gray-400 mb-4">记住这些数字...</p>
+          <SequenceDisplay sequence={sequence} onDone={handleSequenceDone} />
+        </div>
+      )}
+
+      {phase === 'input' && (
+        <div className="text-center space-y-6">
+          <p className="text-xl text-gray-300">按顺序点击数字</p>
+          <div className="text-2xl tracking-widest text-indigo-400 h-8">
+            {userInput.map((n, i) => <span key={i}>{n} </span>)}
+          </div>
+          <InputGrid onInput={handleInput} userInput={userInput} maxLength={sequence.length} />
+        </div>
+      )}
+
+      {phase === 'feedback' && (
+        <div className="text-center">
+          <p className="text-4xl">
+            {JSON.stringify(userInput) === JSON.stringify(sequence) ? '✅ 正确！' : '❌ 错误'}
+          </p>
+        </div>
+      )}
+
+      {phase === 'summary' && (
+        <SessionSummary
+          score={score} correctRounds={correctRounds}
+          totalRounds={10} level={level}
+          onRestart={resetGame}
+        />
+      )}
+    </div>
+  )
+}
+```
+
+---
+
+### 第 27 步：前端新建 DashboardPage
+
+安装 recharts：`cd frontend && npm install recharts`
+
+新建 `frontend/src/pages/DashboardPage.tsx`：
+
+```tsx
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useAuthStore } from '../store/authStore'
+import { apiFetch } from '../lib/api'
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
+
+export default function DashboardPage() {
+  const user = useAuthStore(s => s.user)
+  const navigate = useNavigate()
+  const [stats, setStats] = useState<any>(null)
+
+  useEffect(() => {
+    apiFetch('/game/stats').then(setStats)
+  }, [])
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-6">
+      {/* 顶部欢迎栏 */}
+      <div className="flex items-center gap-4 mb-8">
+        <img src={user?.photoURL || ''} className="w-12 h-12 rounded-full" />
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800">你好，{user?.displayName}</h1>
+          <p className="text-gray-500">准备好训练了吗？</p>
+        </div>
+        <button
+          onClick={() => navigate('/game')}
+          className="ml-auto px-6 py-3 bg-indigo-500 text-white rounded-xl font-bold hover:bg-indigo-600"
+        >
+          开始训练
+        </button>
+      </div>
+
+      {/* 统计卡片（参考 Round Tracker Pro 风格） */}
+      <div className="grid grid-cols-3 gap-4 mb-8">
+        <div className="bg-blue-50 rounded-2xl p-6">
+          <p className="text-sm text-blue-500 font-medium uppercase tracking-wide">最高等级</p>
+          <p className="text-4xl font-bold text-blue-700 mt-1">{stats?.bestLevel ?? '-'}</p>
+        </div>
+        <div className="bg-green-50 rounded-2xl p-6">
+          <p className="text-sm text-green-500 font-medium uppercase tracking-wide">平均准确率</p>
+          <p className="text-4xl font-bold text-green-700 mt-1">{stats?.avgAccuracy ?? '-'}%</p>
+        </div>
+        <div className="bg-pink-50 rounded-2xl p-6">
+          <p className="text-sm text-pink-500 font-medium uppercase tracking-wide">总局数</p>
+          <p className="text-4xl font-bold text-pink-700 mt-1">{stats?.totalSessions ?? '-'}</p>
+        </div>
+      </div>
+
+      {/* 折线图 */}
+      {stats?.recentSessions?.length > 0 && (
+        <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <h2 className="text-lg font-bold text-gray-700 mb-4">近期得分趋势</h2>
+          <ResponsiveContainer width="100%" height={200}>
+            <LineChart data={[...stats.recentSessions].reverse()}>
+              <XAxis dataKey="playedAt" hide />
+              <YAxis />
+              <Tooltip />
+              <Line type="monotone" dataKey="score" stroke="#6366f1" strokeWidth={2} dot={false} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+    </div>
+  )
+}
+```
+
+---
+
+### 第 28 步：更新路由 App.tsx
+
+修改 `frontend/src/App.tsx`，加入新路由：
+
+```tsx
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import LoginPage from './pages/LoginPage'
+import DashboardPage from './pages/DashboardPage'
+import GamePage from './pages/GamePage'
+import ProtectedRoute from './components/ProtectedRoute'
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/home" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+        <Route path="/game" element={<ProtectedRoute><GamePage /></ProtectedRoute>} />
+      </Routes>
+    </BrowserRouter>
+  )
+}
+```
+
+---
+
+### 第 29 步：重做 LoginPage UI（Tailwind + Framer Motion）
+
+修改 `frontend/src/pages/LoginPage.tsx`：
+
+```tsx
+import { motion } from 'framer-motion'
+import { signInWithPopup } from 'firebase/auth'
+import { auth, googleProvider } from '../lib/firebase'
+import { useAuthStore } from '../store/authStore'
+import { useNavigate } from 'react-router-dom'
+import { apiFetch } from '../lib/api'
+
+export default function LoginPage() {
+  const setUser = useAuthStore(s => s.setUser)
+  const navigate = useNavigate()
+
+  const handleLogin = async () => {
+    const result = await signInWithPopup(auth, googleProvider)
+    setUser(result.user)
+    await apiFetch('/users/login', { method: 'POST' })
+    navigate('/home')
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900 flex items-center justify-center">
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="bg-white/10 backdrop-blur-md rounded-3xl p-10 text-center text-white w-96 border border-white/20"
+      >
+        <div className="text-6xl mb-4">🧠</div>
+        <h1 className="text-4xl font-bold mb-2">FocusForge</h1>
+        <p className="text-gray-300 mb-8">训练你的工作记忆，提升专注力</p>
+        <button
+          onClick={handleLogin}
+          className="w-full py-3 bg-white text-indigo-900 rounded-xl font-bold text-lg hover:bg-gray-100 transition-all"
+        >
+          使用 Google 登录
+        </button>
+      </motion.div>
+    </div>
+  )
+}
+```
+
+---
+
+### 第 30 步：测试验证
+
+```bash
+# 后端（已在跑）
+cd backend && npm run start:dev
+
+# 前端
+cd frontend && npm run dev
+```
+
+验证：
+1. 登录页有渐变背景 + 入场动画
+2. 能正常 Google 登录 → 跳转 Dashboard
+3. Dashboard 显示统计卡片
+4. 点"开始训练" → 进入游戏页
+5. 完成一局 → MongoDB 有新记录（含 accuracy 字段）
+6. 回到 Dashboard → 图表有数据
+
+---
+
+## Sprint 4 — GitHub Actions + AWS 部署（同原计划）
+
+参考文件上方 Sprint 3（原）和 Sprint 4 章节，步骤不变：
+1. GitHub Actions CI（frontend-ci.yml + backend-ci.yml）
+2. 前端 → AWS Amplify
+3. 后端 → AWS Elastic Beanstalk
+4. 收尾：CORS + Firebase 授权域名

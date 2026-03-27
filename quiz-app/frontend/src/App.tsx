@@ -7,6 +7,7 @@ import { Routes, Route} from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
 import ProtectedRouter from "./components/ProtectedRoute";
+import Chart from "./try";
 
 /**
  *    规则一：用户访问 /（根路径）→ 显示 LoginPage  
@@ -17,11 +18,14 @@ import ProtectedRouter from "./components/ProtectedRoute";
 export default function App(){
   return(
     <Routes>
-      <Route path="/" element={<LoginPage />} />
+      <Route path="/" element={<LoginPage/>} />
+
+        <Route path="/chart" element={<Chart/>}/>
 
       <Route path="/home" element={
         <ProtectedRouter>
           <HomePage/>
+     
         </ProtectedRouter>
       }/>
     </Routes>

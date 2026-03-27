@@ -19,6 +19,12 @@ export class GameSession {
 
   @Prop({ default: Date.now })
   playedAt: Date
+
+  @Prop({ default: 0 })
+  accuracy: number   // 本局答对率 0-100
+
+@Prop({ default: 0 })
+  totalRounds: number  // 本局总轮数
 }
 
 export const GameSessionSchema = SchemaFactory.createForClass(GameSession)

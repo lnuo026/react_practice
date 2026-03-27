@@ -24,7 +24,7 @@ export class GameController {
   @UseGuards(AuthGuard)
   async saveSession(
     @Req() req,
-    @Body() body: { score: number; level: number; duration: number }
+    @Body() body: { score: number; level: number; duration: number; accuracy: number; totalRounds: number }
   ) {
     return this.gameService.saveSession({
       userId: req.user.uid,
@@ -37,5 +37,12 @@ export class GameController {
   @UseGuards(AuthGuard)
   async getHistory(@Req() req) {
     return this.gameService.getHistory(req.user.uid)
+  }
+
+  // GET /game/stats — 获取当前用户统计数据
+  @Get('stats')
+  @UseGuards(AuthGuard)
+  async getStats(@Req() req) {
+    return this.gameService.getStats(req.user.uid)
   }
 }
