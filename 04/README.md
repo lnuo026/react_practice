@@ -70,10 +70,7 @@ async function fetchPokemonByGen(gen) {
 
 ----
 
-
 😵‍💫
-### ？？
-
 ###  ？？在根目录 npm install 
  Monorepo + Workspaces  ： "workspaces": ["frontend", "backend"]   
  npm 看到这个，在根目录运行 npm install                              
@@ -91,3 +88,26 @@ async function fetchPokemonByGen(gen) {
   - npm 读 package.json ( 项目信息、依赖列表、启动命令) 
   - Node.js 读 .env （秘密变量（密码、端口、API密钥）
   - Docker 读 docker-compose.yml  （Docker 容器配置（启动哪些服务））[text](../../lab/mern-pokedex/backend/src/db/schema.js)
+
+---
+
+## routes
+ init-db.js 就是一个搬运工脚本，运行一次，把 json 里的数据全搬进 MongoDB：                           
+                                          
+  // init-db.js 做了三件事：                                                                          
+                                                                                                      
+  // 1. 连接数据库                                                                                    
+  await mongoose.connect(process.env.DB_URL);                                                         
+                                                                                                      
+  // 2. 清空旧数据                        
+  await Species.deleteMany();                                                                         
+                                                                                                      
+  // 3. 读 json 文件，全部存进数据库          
+  const speciesData = JSON.parse(fs.readFileSync("./src/data/species.json"));                         
+  const species = speciesData.map((s) => new Species(s));   
+  await Species.bulkSave(species);                                                                    
+                                          
+  运行方式：npm run init-db（只需要运行一次）                                                         
+                                                                                                      
+  运行完之后，数据就永久存在 MongoDB 里了，species.json 只是原始来源，之后不再需要它。
+

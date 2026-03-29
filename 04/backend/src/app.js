@@ -19,9 +19,9 @@ app.use(express.json());
 app.use(express.static("public"));
 
 // Import and use our application routes.
-// import apiRoutes from "./routes/api.js";
-// app.use("/api", apiRoutes);
+import apiRoutes from "./routes/api.js";
+app.use("/api", apiRoutes);
 
 // Start the DB running. Then, once it's connected, start the server.
-// await mongoose.connect(process.env.DB_URL);
+await mongoose.connect(process.env.DB_URL);
 app.listen(PORT, () => console.log(`App server listening on port ${PORT}!`));

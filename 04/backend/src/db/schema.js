@@ -20,4 +20,5 @@ const speciesSchema = new Schema(
   }
 );
 
+// Species 就是操作数据库的"遥控器"  
 export const Species = mongoose.model("Species", speciesSchema);
