@@ -1,23 +1,38 @@
 import PokemonList from "./components/PokemonList";
 import PokemonView from "./components/PokemonView";
 import SearchBar from "./components/SearchBar";
-import { dummyData } from "./js/dummy-data";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function App() {
+  // All pokemon (start with empty array)
+  const [pokemon, setPokemon] = useState([]);
+
   // Keep track of selected pokemon
   const [selectedPokemon, setSelectedPokemon] = useState(null);
 
   // Keep track of search options
   const [searchOptions, setSearchOptions] = useState({
     searchTerm: "",
-    gen: "all"
+    gen: "1"
   });
 
   // Filtered list based on searchTerm
-  const filteredPokemon = dummyData.filter((pokemon) =>
+  const filteredPokemon = pokemon.filter((pokemon) =>
     pokemon.name.toLowerCase().includes(searchOptions.searchTerm.toLowerCase())
   );
+
+  // Function to fetch pokemon based on search gen
+  async function fetchPokemonByGen(gen) {
+    const url = `https://pkserve.ocean.anhydrous.dev/api/pokedex?gen=${gen}`;
+    const response = await fetch(url);
+    const data = await response.json();
+    setPokemon(data);
+  }
+
+  // Effect to fetch pokemon when gen changes
+  useEffect(() => {
+    fetchPokemonByGen(searchOptions.gen);
+  }, [searchOptions.gen]);
 
   return (
     <div className="pokedex-container">
@@ -40,7 +55,7 @@ function App() {
       </nav>
 
       {/* Right Panel - Pokemon Details */}
-      <PokemonView pokemon={selectedPokemon} />
+      <PokemonView dexNumber={selectedPokemon?.dexNumber} />
     </div>
   );
 }
