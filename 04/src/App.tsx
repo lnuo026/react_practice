@@ -1,3 +1,7 @@
+import PokemonList from "./components/PokemonList";
+import SearchBar from "./components/SearchBar";
+
+
 function App(){
   return(
     <div className="pokedex-container">
@@ -5,66 +9,8 @@ function App(){
       <nav className="sidebar">
         <h2>Pokedex</h2>
 
-        <div className="search-container">
-          <select className="search-input generation-filter">
-            <option value="all">All Generations</option>
-              <option value="1">Gen 1 (Kanto)</option>
-              <option value="2">Gen 2 (Johto)</option>
-              <option value="3">Gen 3 (Hoenn)</option>
-              <option value="4">Gen 4 (Sinnoh)</option>
-              <option value="5">Gen 5 (Unova)</option>
-              <option value="6">Gen 6 (Kalos)</option>
-              <option value="7">Gen 7 (Alola)</option>
-              <option value="8">Gen 8 (Galar & Hisui)</option>
-              <option value="9">Gen 9 (Paldea)</option>
-          </select>
-          <input type="text" className="search-input" placeholder="Search Pokemon"/>
-          </div>
-
-        <div className="pokemon-list">
-            <div className="pokemon-list-item">
-              <span className="pokemon-number">#003</span>
-              <span className="pokemon-name">Venusaur</span>
-            </div>
-            <div className="pokemon-list-item">
-              <span className="pokemon-number">#006</span>
-              <span className="pokemon-name">Charizard</span>
-            </div>
-            <div className="pokemon-list-item">
-              <span className="pokemon-number">#009</span>
-              <span className="pokemon-name">Blastoise</span>
-            </div>
-            <div className="pokemon-list-item">
-              <span className="pokemon-number">#025</span>
-              <span className="pokemon-name">Pikachu</span>
-            </div>
-            <div className="pokemon-list-item">
-              <span className="pokemon-number">#059</span>
-              <span className="pokemon-name">Arcanine</span>
-            </div>
-            <div className="pokemon-list-item">
-              <span className="pokemon-number">#094</span>
-              <span className="pokemon-name">Gengar</span>
-            </div>
-            <div className="pokemon-list-item">
-              <span className="pokemon-number">#130</span>
-              <span className="pokemon-name">Gyarados</span>
-            </div>
-            <div className="pokemon-list-item active">
-              <span className="pokemon-number">#149</span>
-              <span className="pokemon-name">Dragonite</span>
-            </div>
-            <div className="pokemon-list-item">
-              <span className="pokemon-number">#150</span>
-              <span className="pokemon-name">Mewtwo</span>
-            </div>
-            <div className="pokemon-list-item">
-              <span className="pokemon-number">#151</span>
-              <span className="pokemon-name">Mew</span>
-            </div>
-          </div>
-      </nav>
-      
+     <SearchBar />
+       </nav>
       {/* Right Panel - Pokemon Details */}
       <main className="main-content">
        {/* Pokemon header */}
