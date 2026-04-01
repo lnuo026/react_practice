@@ -35,7 +35,7 @@ export class GameService {
 
   async saveSession(data: {
   userId: string; score: number; level: number;
-  duration: number; accuracy: number; totalRounds: number
+  duration: number; accuracy: number; totalRounds: number; gameType?: string
 }): Promise<GameSession> {
   return this.gameModel.create(data)
 }

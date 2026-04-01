@@ -24,7 +24,7 @@ export class GameController {
   @UseGuards(AuthGuard)
   async saveSession(
     @Req() req,
-    @Body() body: { score: number; level: number; duration: number; accuracy: number; totalRounds: number }
+    @Body() body: { score: number; level: number; duration: number; accuracy: number; totalRounds: number; gameType?: string }
   ) {
     return this.gameService.saveSession({
       userId: req.user.uid,

@@ -25,6 +25,9 @@ export class GameSession {
 
 @Prop({ default: 0 })
   totalRounds: number  // 本局总轮数
+
+  @Prop({ default: '' })
+  gameType: string  // 'item-match' 等，历史记录默认为空字符串
 }
 
 export const GameSessionSchema = SchemaFactory.createForClass(GameSession)

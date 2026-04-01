@@ -104,13 +104,88 @@ import { useState } from 'react'
     const [weightKg, setWeightKg] = useState(60)
     const [note, setNote] = useState('')
 
-    return <div>todo</div>
-  }
+        // onChange 是什么
+        // 在做什么： 监听输入框的变化，每次用户打字就更新状态。每打一个字触发一次，状态实时更新。  
+        //   onChange={e => setExercise(e.target.value)}          
+        //           ↑          ↑                             
+        //      事件对象    输入框当前的值                      
+                                                          
+        // 用户打一个字                                         
+        //   → 浏览器触发 onChange 事件                         
+        //   → 把事件对象 e 传进来                              
+        //   → e.target 是这个输入框                            
+        //   → e.target.value 是输入框里现在的文字              
+        //   → setExercise 把状态更新成这个文字  
+    return <div className='min -h-screen bg-gray-100 p-8'>
+      <h1 className='font-pixel text-2xl text-center mb-8'>WORKOUT LOG</h1>
+
+      {/*  表单  */}
+      <div className="max-w-xl mx-auto bg-white p-6 mb-6 shadow">
+        <input 
+        type="text" 
+        placeholder='action name 是咩啊？'
+        value={exercise}
+        onChange={e => setExercise(e.target.value)}
+        className="w-full border p-2 mb-3 font-pixel text-sm"
+        />
+
+        <button 
+        onClick={handleAdd}
+        className="w-full bg-green-400 p-3 font-pixel text-sm" 
+        > 
+        + 添加
+        </button>
+      </div>
+      
+      {/* 记录列表 */}
+      <div className="max-w-xl mx-auto flex flex-col gap-3">
+        {logs.map( log => ( 
+          <div key={log.id} className="bg-white p-4 shadow font-pixel text-sm">
+            {log.exercise} - {log.weightKg} Kg  - {log.date}
+          </div>
+        ))}
+
+      </div>
+
+    </div>
 
 
-  // addLog 函数                                                                                  
-  // 在做什么： 点击添加按钮时，把表单里的数据变成一条  
-  // WorkoutLog，加进 logs 数组里。                       
+// addLog 函数                                                                                  
+// 在做什么： 点击添加按钮时，把表单里的数据变成一条WorkoutLog，加进 logs 数组里。                       
+// 为什么： 练习怎么用 setLogs                          
+// 更新状态，以及怎么构造一个符合 interface 的对象。 
+
+function handleAdd(){
   
-  // 为什么： 练习怎么用 setLogs                          
-  // 更新状态，以及怎么构造一个符合 interface 的对象。 
+  //trim() 去掉首尾空格。如果用户没填动作名（空字符串或只有空格），直接退出函数，不添加记录。                                                  
+  if (!exercise.trim()) return
+  
+  // WorkoutLog的一个对象，每个字段都要有
+  const newLog: WorkoutLog = {                     
+    id: nextId,                                      
+    //  split('X') = 遇到 X 就切断，结果是数组
+    date: new Date().toISOString().split('T')[0],    
+    exercise: exercise.trim(),
+    muscleGroup: muscleGroup,                        
+    sets: sets,                                      
+    reps: reps,
+    weightKg: weightKg,                              
+    note: note.trim() || undefined,                
+  }                                                  
+  
+  // React 把当前的 logs 值传进来，你叫它 prev   
+  //  ...prev  → 展开旧数组里所有记录  
+  setLogs(prev => [newLog, ...prev])      
+  
+  //   添加完之后：                                         
+  // - id 加一，下次用                                    
+  // - 清空动作名输入框                                   
+  // - 清空备注输入框 
+  setNextId(prev => prev + 1)                      
+  setExercise('')                                    
+  setNote('')      
+}
+
+
+
+

@@ -1,33 +1,54 @@
-/**
- * 从 react-router-dom 拿出两个组件：                        
-  - Routes — 路由容器，包裹所有路由规则                     
-  - Route — 单条路由规则（地址 → 页面）    
- */ 
-import { Routes, Route} from "react-router-dom";
-import LoginPage from "./pages/LoginPage";
-import HomePage from "./pages/HomePage";
-import ProtectedRouter from "./components/ProtectedRoute";
-import Chart from "./try";
+import { Routes, Route, useLocation } from "react-router-dom"
+import LoginPage from "./pages/LoginPage"
+import HomePage from "./pages/HomePage"
+import DashboardPage from "./pages/DashboardPage"
+import ItemMatchPage from "./pages/ItemMatchPage"
+import ProtectedRouter from "./components/ProtectedRoute"
+import { useChiptuneMusic } from "./hooks/useChiptuneMusic"
 
-/**
- *    规则一：用户访问 /（根路径）→ 显示 LoginPage  
-      规则二：用户访问 /home → 先经过 ProtectedRoute 检查： 
-      - 已登录 → 显示 HomePage                                  
-      - 未登录 → 自动跳回 /  
- */
-export default function App(){
-  return(
-    <Routes>
-      <Route path="/" element={<LoginPage/>} />
+function MusicButton() {
+  const { isPlaying, toggle } = useChiptuneMusic()
+  const { pathname } = useLocation()
+  if (pathname === '/') return null
+  return (
+    <button
+      onClick={toggle}
+      title={isPlaying ? '关闭音乐' : '开启音乐'}
+      className={`fixed bottom-5 right-5 z-[200] w-[52px] h-[52px] pixel-border font-pixel text-[22px] flex items-center justify-center transition-colors duration-200 cursor-pointer ${isPlaying ? 'bg-gold' : 'bg-sand'}`}
+      onMouseDown={e => {
+        e.currentTarget.style.transform = 'translate(2px,2px)'
+        e.currentTarget.style.boxShadow = '2px 2px 0 #4a3728'
+      }}
+      onMouseUp={e => {
+        e.currentTarget.style.transform = ''
+        e.currentTarget.style.boxShadow = '4px 4px 0 #4a3728'
+      }}
+    >
+      {isPlaying ? '🎵' : '🔇'}
+    </button>
+  )
+}
 
-        <Route path="/chart" element={<Chart/>}/>
+export default function App() {
+  return (
+    <>
+      <Routes>
+        <Route path="/" element={<LoginPage />} />
 
-      <Route path="/home" element={
-        <ProtectedRouter>
-          <HomePage/>
-     
-        </ProtectedRouter>
-      }/>
-    </Routes>
+        <Route path="/home" element={
+          <ProtectedRouter><HomePage /></ProtectedRouter>
+        } />
+
+        <Route path="/dashboard" element={
+          <ProtectedRouter><DashboardPage /></ProtectedRouter>
+        } />
+
+        <Route path="/item-match" element={
+          <ProtectedRouter><ItemMatchPage /></ProtectedRouter>
+        } />
+      </Routes>
+
+      <MusicButton />
+    </>
   )
 }
