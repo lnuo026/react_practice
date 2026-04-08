@@ -3,6 +3,7 @@ import {
   PressStart2P_400Regular,
   useFonts,
 } from "@expo-google-fonts/press-start-2p";
+// useMemo — cache computed results (React built-in)
 import { useMemo, useState } from "react";
 import {
   Dimensions,
@@ -68,13 +69,18 @@ export default function HomeScreen() {
   const [message, setMessage] = useState("");
   const [inputText, setInputText] = useState("");
 
+  // Without useMemo:
+  //   Every state change → component re-renders → grass tiles re-randomized → grass keeps flickering!
+  // With useMemo:
+  //   First render → compute grass layout → cache the result
+  //   Later state changes → component re-renders → use cache directly → grass stays stable
   const tileMap = useMemo(
     () =>
       Array.from(
         { length: rows * cols },
         () => GRASS_TILES[Math.floor(Math.random() * GRASS_TILES.length)],
       ),
-    [],
+    [], // ← dependency array, [] means compute only once
   );
 
   const handleRefresh = () => {
@@ -82,7 +88,6 @@ export default function HomeScreen() {
     setDogX(Math.random() * (width - DOG_WIDTH * SCALE));
     setDogY(Math.random() * (height * 0.4));
   };
-
   const handleDogPress = () => {
     setCurrentAnim(ANIMATIONS[2]);
     setShowDialog(true);
@@ -95,8 +100,10 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      {/* 草地背景 */}
+      {/* Grass background */}
       {tileMap.map((src, i) => (
+        // Image uses inline styles: left and top are dynamically calculated (each tile has a different position),
+        // so they can't be hardcoded in StyleSheet — they're written directly on the element.
         <Image
           key={i}
           source={src}
@@ -110,7 +117,7 @@ export default function HomeScreen() {
         />
       ))}
 
-      {/* Refresh 按钮 — 居中 */}
+      {/* Refresh button — centered */}
       <View style={styles.refreshWrapper}>
         <Pressable
           onPress={handleRefresh}
@@ -125,7 +132,7 @@ export default function HomeScreen() {
         </Pressable>
       </View>
 
-      {/* 房子 */}
+      {/* Dog house */}
       <Pressable
         onPress={() => setIsRed(!isRed)}
         style={({ pressed }) => [styles.doghouse, pressed && { opacity: 0.5 }]}
@@ -143,8 +150,9 @@ export default function HomeScreen() {
         </View>
       </Pressable>
 
-      {/* 告示牌 */}
+      {/* 👇👇👇👇👇 Sign board */}
       <Pressable
+        // onclick
         onPress={() => setShowInput(true)}
         style={({ pressed }) => [styles.sign, pressed && { opacity: 0.5 }]}
       >
@@ -160,7 +168,7 @@ export default function HomeScreen() {
         ) : null}
       </Pressable>
 
-      {/* 小狗 */}
+      {/* Dog */}
       <Pressable
         onPress={handleDogPress}
         style={({ pressed }) => [
@@ -184,7 +192,7 @@ export default function HomeScreen() {
         />
       </Pressable>
 
-      {/* 对话气泡 */}
+      {/* Dialog bubble */}
       {showDialog && (
         <View
           style={{
@@ -205,7 +213,8 @@ export default function HomeScreen() {
         </View>
       )}
 
-      {/* 留言 Modal */}
+      {/* 👇👇👇👇👇Message Modal */}
+
       <Modal visible={showInput} transparent animationType="fade">
         <Pressable
           style={styles.modalOverlay}
@@ -215,12 +224,12 @@ export default function HomeScreen() {
             style={styles.modalBox}
             onPress={(e) => e.stopPropagation()}
           >
-            <Text style={[styles.modalTitle, pixelFont]}>Leave a message</Text>
+            <Text style={[styles.modalTitle, pixelFont]}>Leave a text</Text>
             <TextInput
               style={[styles.input, pixelFont]}
               value={inputText}
               onChangeText={setInputText}
-              placeholder="type here..."
+              placeholder="leave a message for Hammer..."
               maxLength={20}
               autoFocus
             />
@@ -229,6 +238,7 @@ export default function HomeScreen() {
                 setMessage(inputText);
                 setShowInput(false);
               }}
+              //👇 press👇
               style={({ pressed }) => [
                 styles.modalBtn,
                 pressed && { opacity: 0.7 },
@@ -245,12 +255,14 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
+
   dog: { position: "absolute", overflow: "visible" },
   doghouse: {
     position: "absolute",
     right: 70,
     bottom: 200,
   },
+
   sign: {
     position: "absolute",
     right: 190,
@@ -259,6 +271,7 @@ const styles = StyleSheet.create({
     height: 64,
     alignItems: "center",
   },
+
   signLabel: { fontSize: 12, color: "#daecf3", marginTop: 2 },
   refreshWrapper: {
     position: "absolute",
@@ -269,17 +282,21 @@ const styles = StyleSheet.create({
     zIndex: 20,
     pointerEvents: "box-none",
   },
+
+  // 👇
   refreshBtn: {
     backgroundColor: "#333",
     borderRadius: 8,
     padding: 10,
   },
+
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.5)",
     justifyContent: "center",
     alignItems: "center",
   },
+
   modalBox: {
     backgroundColor: "#ffffff",
     borderRadius: 12,
@@ -288,10 +305,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 16,
   },
+
   modalTitle: {
     fontSize: 10,
     color: "#333",
   },
+
   input: {
     borderWidth: 1,
     borderColor: "#ccc",

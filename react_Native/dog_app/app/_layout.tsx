@@ -1,17 +1,17 @@
-// 一句话总结这个文件的作用：
-// 告诉 Expo Router "整个 App 用栈式导航，首页不显示顶部标题栏"。
+// One-line summary of this file:
+// Tells Expo Router "use stack navigation for the whole app, and hide the top header on the home screen".
 import { Stack } from "expo-router";
-//       ↑ 从 expo-router 这个包里，取出 Stack 这个组件
+//       ↑ Import the Stack component from the expo-router package
 
 export default function RootLayoout() {
-  //             ↑ 定义并导出一个名叫 RootLayoout 的组件（函数）
-  //               Expo Router 会自动找到并使用它
+  //             ↑ Define and export a component (function) called RootLayoout
+  //               Expo Router will automatically find and use it
   return (
     <Stack>
-      {/* ↑ 使用栈式导航，所有子页面都在这个"栈"里切换 */}
+      {/* ↑ Use stack navigation — all child screens switch within this "stack" */}
       <Stack.Screen name="index" options={{ headerShown: false }} />
-      {/*            ↑ 给 index 页面单独配置：
-          headerShown: false = 不显示顶部导航栏（Header）*/}
+      {/*            ↑ Individual config for the index screen:
+          headerShown: false = hide the top navigation bar (Header)*/}
     </Stack>
   );
 }

@@ -61,7 +61,7 @@ import SpriteAnimation from './SpriteAnimation';
     return (
       <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden', cursor: 'url(/assets/sign/mouse.png), auto' }}>
 
-        {/* 草地背景 */}
+        {/* Grass background */}
         {tileMap.map((src, i) => (
           <img key={i} src={src} style={{
             position: 'absolute',
@@ -72,7 +72,9 @@ import SpriteAnimation from './SpriteAnimation';
         ))}
 
 
-        {/* Refresh 按钮 */}
+
+
+        {/* Refresh button */}
         <div style={{ position: 'absolute',
                       top: 50,
                       left: 0,
@@ -90,7 +92,7 @@ import SpriteAnimation from './SpriteAnimation';
           </button>
         </div>
 
-        {/* 房子 */}
+        {/* House */}
         <div onClick={() => setIsRed(!isRed)} style={{
           position: 'absolute', right: 170, bottom: 270,
           width: 128, height: 128, overflow: 'hidden', cursor: 'pointer',
@@ -101,17 +103,22 @@ import SpriteAnimation from './SpriteAnimation';
           }} />
         </div>
 
-        {/* inlinecss */}
-        {/* 告示牌 */}
+
+
+        {/*👇‼️👇  inlinecss */}
+
         <div onClick={() => setShowInput(true)} style={{
           position: 'absolute', right: 300, bottom: 260,
           width: 64, height: 64, cursor: 'pointer', textAlign: 'center',
-        }}>
+        }}>1
           <img src="/assets/sign/sign.png" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
           {message && <div style={{ fontSize: 15, color: '#f0eaea', fontFamily: "'Press Start 2P', monospace" }}>{message.slice(0, 6)}</div>}
         </div>
 
-        {/* 小狗 */}
+
+
+
+        {/* Dog */}
         <div onClick={handleDogClick} style={{
           position: 'absolute', left: dogX, top: dogY, cursor: 'pointer',
         }}>
@@ -124,7 +131,7 @@ import SpriteAnimation from './SpriteAnimation';
           />
         </div>
 
-        {/* 对话气泡 */}
+        {/* Dialog bubble */}
         {showDialog && (
           <div style={{
             position: 'absolute', left: dogX + 15, top: dogY + 130,
@@ -136,7 +143,7 @@ import SpriteAnimation from './SpriteAnimation';
           </div>
         )}
 
-        {/* 留言 Modal */}
+        {/*👇‼️👇 Modal */}
         {showInput && (
           <div onClick={() => setShowInput(false)} style={{
             position: 'fixed', inset: 0,
