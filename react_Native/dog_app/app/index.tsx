@@ -83,6 +83,8 @@ export default function HomeScreen() {
     [], // ← dependency array, [] means compute only once
   );
 
+
+  // functions
   const handleRefresh = () => {
     setCurrentAnim(ANIMATIONS[Math.floor(Math.random() * ANIMATIONS.length)]);
     setDogX(Math.random() * (width - DOG_WIDTH * SCALE));
@@ -94,10 +96,14 @@ export default function HomeScreen() {
     setTimeout(() => setShowDialog(false), 3000);
   };
 
+
+
   const pixelFont = fontsLoaded
     ? { fontFamily: "PressStart2P_400Regular" }
     : {};
 
+
+    
   return (
     <View style={styles.container}>
       {/* Grass background */}
