@@ -1,6 +1,7 @@
+/* Tailwind v4 的启动方式，没有这行所有 class 都无效 */
 @import "tailwindcss";                             
-                                                       
-  @theme {                                             
+/* 定义自己的设计变量（比如自定义字体） */
+@theme {                                             
     --font-pixel: 'Press Start 2P', cursive;           
   }                                                    
                                                      
