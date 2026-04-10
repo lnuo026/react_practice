@@ -10,7 +10,7 @@ export default function ArticlesSummaryPage() {
     return null;
   } else {
     return (
-      <Main title="Check out these amazing articles!">
+      <Main title="Check out these amazing articles!🐶">
         <FeaturedArticles articles={articles} />
       </Main>
     );

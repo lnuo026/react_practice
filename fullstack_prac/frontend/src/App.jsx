@@ -27,6 +27,7 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<PageWithAppBar title="Blogogog" tabs={navbarTabs} />}>
+      {/* 访问根路径，自动跳转到 /articles */}
         <Route index element={<Navigate to="/articles" />} />
 
         <Route path="articles">

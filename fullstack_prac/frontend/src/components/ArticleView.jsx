@@ -10,6 +10,7 @@ export default function ArticleView({ article }) {
     return (
       <Main image={getImagePath(article.image)} title={article.title}>
         <Typography paragraph>{article.content}</Typography>
+        <Typography paragraph>{article.date}</Typography>
       </Main>
     );
   } else {
