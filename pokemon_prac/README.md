@@ -1,53 +1,41 @@
-## interactivity
-组件的互动 
-user 可以直接使用search  ,select toggle 图片
-之前都是固定数据 hardcode
-
-clsx
-第三方工具库，专门用来动态拼接 className。 
-```
-<div className={clsx("pokemon-list-item", { active: isActive
-})} />    
-```                                                  
-- 第一个参数：固定的类名，始终添加          
-- 第二个参数：对象，key 是类名，value 是条件，条件为 true 才添加     
+ ## App.jsx里面的dummy删掉，换成 useState ，fetch后直接使用  setPokem(data);
+ 之前（step-05）：                           
+  import { dummyData } from "./js/dummy-data.js"
+  // 数据直接从本地文件来                       
+                                                               
+  之后（step-06）：                           
+  const [pokemon, setPokemon] = useState([]);                  
+  // 空数组作为初始值，等网络请求回来再填充   
 
 
-...props 剩余参数  
-...props 表示"把剩下所有没有明确取出来的props，全部收集到一个叫 props 的对象里"。
+开始api
 
-// pokemon → 取出来了
-// isSelected → 取出来了
-// 其他所有传进来的 props → 全部收集在 props 里
-```
-function PokemonListItem({ pokemon, isSelected, ...props }) {
+`https://pkserve.ocean.anhydrous.dev/api/pokedex`
 
-}
-```
-## 实际用途：                                  
-通常用来把剩余 props 传给内部的 HTML 元素：
 
-```
-<div {...props}>
-```
+  // Function to fetch pokemon based on search gen
+  async function fetchPokemonByGen(gen) {
+    const url = `https://pkserve.ocean.anhydrous.dev/api/pokedex?gen=${gen}`;
+    const response = await fetch(url);
+    const data = await response.json();
+    setPokemon(data);
+  }
 
-这样父组件传进来的 onClick、className 等属性会自动透传给这个
-div，不需要一个个手动写。
+  // Effect to fetch pokemon when gen changes
+  useEffect(() => {
+    fetchPokemonByGen(searchOptions.gen);
+  }, [searchOptions.gen]);c
 
-父组件
-```
-export default function PokemonList({ pokemon, selectedId, onSelectPokemon }) {
-  return (
-    <div className="pokemon-list">
-      {pokemon.map((mon) => (
-        <PokemonListItem
-          key={mon._id}
-          pokemon={mon}
-          isSelected={mon._id === selectedId}
-          onClick={() => onSelectPokemon(mon)}
-        />
-      ))}
-    </div>
-  );
-}
-```
+
+
+## onChange 是事件监听，用户每次改变输入框/下拉框的值时触发：
+
+onChange={处理函数}
+
+处理函数会自动收到一个事件对象 e，里面有用户输入的值：
+e.target       // 触发事件的那个 HTML 元素
+e.target.value // 那个元素当前的值
+
+`onChange={(e) => onSearchOptionsChange({ gen: e.target.value })}`
+ { gen: e.target.value } → 构造一个对象，只更新 gen 字段
+

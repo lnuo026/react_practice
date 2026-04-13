@@ -3,9 +3,10 @@ export default function SearchBar( {searchOptions, onSearchOptionsChange} ) {
 
   return (
     <div className="search-container">
-      <select className="search-input generation-filter"
+      <select
+      className="search-input generation-filter"
       value={gen}
-      onChange={(e) => onSearchOptionsChange(searchTerm, e.target.value)} 
+      onChange={(e) => onSearchOptionsChange({ gen: e.target.value })}
       >
         <option value="all">All Generations</option>
         <option value="1">Gen 1 (Kanto)</option>
