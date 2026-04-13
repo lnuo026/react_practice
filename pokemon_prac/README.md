@@ -1,54 +1,48 @@
-# 加载图
-问题： 切换宝可梦时，新图还没加载完，页面会闪烁或空白。      
-
-解决： 用 URL 作为加载状态的标记，而不是简单的 true/false。
-
-
-## 断路逻辑
-A && B
-- A 为 true → 执行并返回 B                                   
-- A 为 false → 直接停，B 不执行    
-
-
-```
- const [loadedNormalUrl, setLoadedNormalUrl] = useState(null);
-  const [loadedShinyUrl, setLoadedShinyUrl] = useState(null);
-
-  // Check if the current images have loaded by comparing URLs
-  const normalLoaded = loadedNormalUrl === normalImage;
-  const shinyLoaded = loadedShinyUrl === shinyImage;
-
-  // Determine if the currently displayed image has loaded
-  const isCurrentImageLoaded = displayShiny ? shinyLoaded : normalLoaded;
-：                                            
+## 后端的"引子"是 package.json （看起来好像只是新建了几个文件）
+#### 流程
+  第一步：package.json 声明需要哪些包                          
+  "dependencies": {                           
+    "express": "^4.18.2",                                      
+    "cors": "^2.8.5",                                       
+    "mongoose": "^8.1.1"                                       
+  }                                           
+  这是"购物清单"，告诉 npm 要装什么。                          
+                                                            
+  第二步：终端运行 npm install                                 
+                                              
+  npm 读取 package.json，去网上下载所有声明的包，放进          
+  node_modules/。                                              
                                                                
-  ┌─────────────────────┬─────────┬───────────────────────┐ 
-  │        变量          │  类型   │         作用          │    
-  ├─────────────────────┼─────────┼───────────────────────┤ 
-  │ loadedNormalUrl     │ useStat │ 记录已加载完的普通图  │
-  │                     │ e       │ URL                   │    
-  ├─────────────────────┼─────────┼───────────────────────┤
-  │ loadedShinyUrl      │ useStat │ 记录已加载完的闪光图  │    
-  │                     │ e       │ URL                   │ 
-  ├─────────────────────┼─────────┼───────────────────────┤    
-  │ isCurrentImageLoade │ 派生状   │ 当前显示的图是否加载  │
-  │ d                   │ 态      │ 完                    │    
-  └─────────────────────┴─────────┴───────────────────────┘    
-   
+  第三步：代码里 import 才能用                                 
+  import express from "express";  // 从 node_modules 里取出    
+  express                                                      
+  const app = express();          // 调用 express              
+  函数创建服务器实例                      
+                                                               
+  ---                                                          
+  总结
+                                                               
+  ┌───────────────────────┬────────────────────────────┐    
+  │         步骤          │            作用            │
+  ├───────────────────────┼────────────────────────────┤       
+  │ package.json          │ 声明需要什么包（购物清单） │
+  ├───────────────────────┼────────────────────────────┤       
+  │ npm install           │ 下载安装这些包             │    
+  ├───────────────────────┼────────────────────────────┤
+  │ import                │ 在代码里引入已安装的包     │
+  ├───────────────────────┼────────────────────────────┤       
+  │ const app = express() │ 使用已引入的包创建服务器   │
+  └───────────────────────┴────────────────────────────┘       
+                                                               
+  const app = express() 是使用，package.json 才是引子。
 
-```
 
 
----
 
+fs = File System，Node.js 内置模块，用来读写本地文件：       
 
-核心逻辑：                                                
+import fs from "fs";                                         
 
-// 图片加载完 → 记录它的 URL                                 
-onLoad={() => setLoadedNormalUrl(normalImage)}
+fs.readFileSync("./data.json")        // 读文件              
+fs.writeFileSync("./data.json", ...) // 写文件
 
-// 比较 URL 判断是否加载完                                
-const normalLoaded = loadedNormalUrl === normalImage;
-
-// 没加载完就显示占位图                     
-{!isCurrentImageLoaded && <img src="placeholder.svg" />} 
