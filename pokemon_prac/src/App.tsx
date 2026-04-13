@@ -19,7 +19,7 @@ function App() {
       </nav>
 
       {/* dummyData 也可以从数组中取出来一个穿给 PokemonView */}
-      <PokemonView pokemon={dummyData[7]} />
+      <PokemonView pokemon={null} />
     </div>
   );
 }

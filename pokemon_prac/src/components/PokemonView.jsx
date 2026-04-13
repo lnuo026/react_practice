@@ -1,12 +1,18 @@
 import PokemonImageView from "./PokemonImageView.jsx";
 import PokemonTypesList from "./PokemonTypesList.jsx";
 import PokedexEntry from "./PokedexEntry.jsx";
+import { placeholderPokemon } from "../js/dummy-data.js";
 
 
 
 export default function PokemonView({ pokemon }) {
-  const { name, dexNumber, dexEntry, normalImage, shinyImage, types } = pokemon;
 
+  // 如果 pokemon 是 null 或 undefined，则使用 placeholderPokemon
+  const { name, dexNumber, dexEntry, normalImage, shinyImage, types } =
+   pokemon || placeholderPokemon; 
+
+
+   
   return (
     <main className="main-content">
       {/* Pokemon header */}
