@@ -1,10 +1,15 @@
-import PokemonListItem from './PokemonListItem.jsx';
+import PokemonListItem from "./PokemonListItem";
 
-export default function PokemonList({ pokemonData }) {
+export default function PokemonList({ pokemon, selectedId, onSelectPokemon }) {
   return (
     <div className="pokemon-list">
-      {pokemonData.map((pokemon) => (
-        <PokemonListItem key={pokemon.id} pokemon={pokemon} />
+      {pokemon.map((mon) => (
+        <PokemonListItem
+          key={mon._id}
+          pokemon={mon}
+          isSelected={mon._id === selectedId}
+          onClick={() => onSelectPokemon(mon)}
+        />
       ))}
     </div>
   );
