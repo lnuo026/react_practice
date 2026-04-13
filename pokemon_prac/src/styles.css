@@ -438,16 +438,22 @@ body {
   width: 8px;
 }
 
+/* 滚动条的轨道（背景槽）  */
 .pokemon-list::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(173, 35, 35, 0.4);
   border-radius: 10px;
 }
 
+
+
+/* 滚动条的滑块（可以拖动的那个块）*/
 .pokemon-list::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #3498db, #2980b9);
-  border-radius: 10px;
+  background: linear-gradient(135deg, #cae1f0, #2980b9);
+  border-radius: 100px;
 }
 
+
+/* thumb:hover —  鼠标悬停在滑块上时 */
 .pokemon-list-item::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, #2980b9, #21618c);
+  background: linear-gradient(135deg, #b1d1f1, #21618c);
 }
