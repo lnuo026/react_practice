@@ -1,13 +1,11 @@
 import PokemonListItem from './PokemonListItem.jsx';
 
-export default function PokemonList() {
+export default function PokemonList({ pokemonData }) {
   return (
     <div className="pokemon-list">
-      <PokemonListItem />
-      <PokemonListItem />
-      <PokemonListItem />
-      <PokemonListItem />
-      <PokemonListItem />
+      {pokemonData.map((pokemon) => (
+        <PokemonListItem key={pokemon.id} pokemon={pokemon} />
+      ))}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-export default function PokemonImageView() {
+export default function PokemonImageView({ normalImage, shinyImage }) {
   return (
     <div className="pokemon-image-container">
       {/* 卡片右上角的小星星⭐️*/}
@@ -10,14 +10,14 @@ export default function PokemonImageView() {
 
       
       <img
-        src="/assets/images/pokemon/149.png"
-        alt="Dragonite"
+        src={normalImage}
+        alt="normal pokemon"
         className="pokemon-image visible"
         id="pokemon-image"
       />
       
       <img
-        src="/assets/images/pokemon/149-shiny.png"
+        src={shinyImage}
         alt="Shiny Dragonite"
         className="pokemon-image"
       />

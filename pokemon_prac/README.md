@@ -1,165 +1,19 @@
- 02 
- hardcoded dtata 拆分组件  into component
+data  + props
+`import { dummyData } from "./js/dummy-data";`
 
+{
+    _id: "4",
+    dexNumber: 147,
+    name: "Dratini",
+    gen: 1,
+    normalImage:
+      "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/147.png",
+    shinyImage:
+      "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/147.png",
+    types: ["Dragon"],
+    crySound: "https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/legacy/147.ogg",
+    dexEntry:
+      "Long considered a mythical POKéMON until recently when a small colony was found living underwater."
+  },
 
-App.tsx
-
-```
-//硬编码 ,把静态 HTML 结构塞进 React 组件
-
-function App() {
-    return (
-      <div className="pokedex-container">
-
-        <nav className="siderbar">
-          <h1>Pokédex</h1>
-
-   {/* Search bar */}
-        <div className="search-container">
-          {/* 变成组件 searchBar */}
-          <select className="search-input generation-filter">
-            <option value="all">All Generations</option>
-            <option value="1">Gen 1 (Kanto)</option>
-            <option value="2">Gen 2 (Johto)</option>
-            <option value="3">Gen 3 (Hoenn)</option>
-            <option value="4">Gen 4 (Sinnoh)</option>
-            <option value="5">Gen 5 (Unova)</option>
-            <option value="6">Gen 6 (Kalos)</option>
-            <option value="7">Gen 7 (Alola)</option>
-            <option value="8">Gen 8 (Galar & Hisui)</option>
-            <option value="9">Gen 9 (Paldea)</option>
-          </select>
-          <input type="text" className="search-input" placeholder="Search Pokémon..." />
-        </div>
-
-
-
-
-        {/* 变成组件 pokemonList */}
-          <div className="pokemon-list">  
-
-              {/* 单个宝可梦 */}
-          <div className="pokemon-list-item">
-            <span className="pokemon-number">#003</span>
-            <span className="pokemon-name">Venusaur</span>
-          </div>        
-          
-          <div className="pokemon-list-item">
-            <span className="pokemon-number">#006</span>
-            <span className="pokemon-name">Charizard</span>
-          </div>
-          <div className="pokemon-list-item">
-            <span className="pokemon-number">#009</span>
-            <span className="pokemon-name">Blastoise</span>
-          </div>
-          <div className="pokemon-list-item">
-            <span className="pokemon-number">#025</span>
-            <span className="pokemon-name">Pikachu</span>
-          </div>
-          <div className="pokemon-list-item">
-            <span className="pokemon-number">#059</span>
-            <span className="pokemon-name">Arcanine</span>
-          </div>
-          <div className="pokemon-list-item">
-            <span className="pokemon-number">#094</span>
-            <span className="pokemon-name">Gengar</span>
-          </div>
-          <div className="pokemon-list-item">
-            <span className="pokemon-number">#130</span>
-            <span className="pokemon-name">Gyarados</span>
-          </div>
-          <div className="pokemon-list-item active">
-            <span className="pokemon-number">#149</span>
-            <span className="pokemon-name">Dragonite</span>
-          </div>
-          <div className="pokemon-list-item">
-            <span className="pokemon-number">#150</span>
-            <span className="pokemon-name">Mewtwo</span>
-          </div>
-          <div className="pokemon-list-item">
-            <span className="pokemon-number">#151</span>
-            <span className="pokemon-name">Mew</span>
-          </div>
-          <div className="pokemon-list-item">
-            <span className="pokemon-number">#155</span>
-            <span className="pokemon-name">Cyndaquil</span>
-          </div>
-          <div className="pokemon-list-item">
-            <span className="pokemon-number">#157</span>
-            <span className="pokemon-name">Typhlosion</span>
-          </div>
-          <div className="pokemon-list-item">
-            <span className="pokemon-number">#181</span>
-            <span className="pokemon-name">Ampharos</span>
-          </div>
-          <div className="pokemon-list-item">
-            <span className="pokemon-number">#196</span>
-            <span className="pokemon-name">Espeon</span>
-          </div>
-          <div className="pokemon-list-item">
-            <span className="pokemon-number">#248</span>
-            <span className="pokemon-name">Tyranitar</span>
-          </div>
-        </div>
-      </nav>
-
-
-
-      {/* 变成组件 Panel */}  
-      {/* right 的panle ，宝可梦detail */}
-      <main className="main-content">
-        
-        {/* Pokemon header */}
-                <div className="pokemon-header">
-                  <h1 className="pokemon-name">Dragonite</h1>
-                  <span className="pokemon-number">#149</span>
-                </div>
-        
-      </main>
-    </div>
-  );
-}
-
-export default App; 
-
-
- ```
-
-
-App.tsx
-```
-import PokemonList from "./components/PokemonList";
-import PokemonView from "./components/PokemonView";
-import SearchBar from "./components/SearchBar";
-
-function App() {
-  return (
-    <div className="pokedex-container">
-      {/* Left Panel - Pokemon List */}
-      <nav className="sidebar">
-        <h2>Pokédex</h2>
-
-        {/* Search bar */}
-        <SearchBar />
-
-        {/* Pokemon list */}
-        <PokemonList />
-      </nav>
-
-      {/* Right Panel - Pokemon Details */}
-      <PokemonView />
-    </div>
-  );
-}
-
-export default App;
-
-```
-
-### App.jsx 里面只有3个组件
-```
-import PokemonList from "./components/PokemonList";
-import PokemonView from "./components/PokemonView";
-import SearchBar from "./components/SearchBar";
-
-```
+  js 里的这些data 依次传给了每一个组件；

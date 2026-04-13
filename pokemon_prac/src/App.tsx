@@ -1,6 +1,7 @@
-import PokemonList from "./components/PokemonList";
-import PokemonView from "./components/PokemonView";
+import PokemonList from "./components/PokemonList.jsx";
+import PokemonView from "./components/PokemonView.jsx";
 import SearchBar from "./components/SearchBar.jsx";
+import { dummyData } from "./js/dummy-data.js";
 
 function App() {
   return (
@@ -12,12 +13,13 @@ function App() {
         {/* Search bar */}
         <SearchBar />
 
-        {/* Pokemon list */}
-        <PokemonList />
+        {/* dummyData 把整个数组传给 PokemonList
+        在 PokemonList 里用 .map() 遍历，每个宝可梦渲染一行  */}
+        <PokemonList pokemonData={dummyData} />
       </nav>
 
-      {/* Right Panel - Pokemon Details */}
-      <PokemonView />
+      {/* dummyData 也可以从数组中取出来一个穿给 PokemonView */}
+      <PokemonView pokemon={dummyData[7]} />
     </div>
   );
 }
