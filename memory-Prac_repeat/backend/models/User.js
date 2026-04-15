@@ -36,8 +36,6 @@ userSchema.methods.comparing = async function(candidatePassword) {
     // bcrypt.compare(明文密码, 加密后的密码)
     // 明文用同样的规则（盐值）再加密一次 - 对比两个加密结果是否匹配
     return await bcrypt.compare(candidatePassword, this.password)
-
-
 }
 
 export default mongoose.model('User', userSchema)
