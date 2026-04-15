@@ -1,6 +1,6 @@
  import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom' ;
  import Navbar from './components/Navbar';
-//  import DeckPage from './components/DeckPage';
+ import DeckCard from './components/DeckCard';
  import FlashCard from './components/FlashCard';
  import ProtectedRoute from './components/ProtectedRoute';
  import { AuthProvider } from './auth/AuthContext';
@@ -21,6 +21,16 @@ export default function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/flashcard" element={<FlashCard 
           front="Hi" back="Hello!" />} />
+          <Route path="/deck" element={<DeckCard 
+          deck={{
+            title: "Sample Deck",
+            description: "This is a sample deck for testing."
+            }}
+            onDelete={() => console.log('delete deckllll')}
+            />} />
+          
+
+
 
           
           <Route
