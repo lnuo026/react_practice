@@ -26,45 +26,36 @@ export default function App() {
           element={<FlashCard 
           front="Hi" back="Hello!" />} 
           />
-          
-          <Route path="/deckcard" 
-          element={<DeckCard 
-            deck={{
-              description: "This is a sample deck for testing."
-            }}
-            onDelete={() => console.log('delete deckllll')}
-            />} 
-            />
-          
-            <Route
-            path="/"
-            element= {
-              <ProtectedRoute>
-                <HomePage />
-              </ProtectedRoute>
-            }
-            />
-         
-
-            <Route 
-            path= "/deck/:deckId"
-            element={
-              <ProtectedRoute>
-              <DeckPage />
-              </ProtectedRoute>
-          
-           } 
+        
+          <Route
+          path="/"
+          element= {
+            <ProtectedRoute>
+              <HomePage />
+            </ProtectedRoute>
+          }
           />
+        
 
           <Route 
-          path="/study/:deckId" 
+          path= "/deck/:deckId"
           element={
             <ProtectedRoute>
-              <StudyPage />
+            <DeckPage />
             </ProtectedRoute>
-          
+        
           } 
-          />
+        />
+
+        <Route 
+        path="/study/:deckId" 
+        element={
+          <ProtectedRoute>
+            <StudyPage />
+          </ProtectedRoute>
+        
+        } 
+        />
 
       {/*
        * 是通配符，意思是"所有其他路径"。 */}
