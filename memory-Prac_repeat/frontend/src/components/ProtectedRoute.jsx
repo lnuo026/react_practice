@@ -1,6 +1,6 @@
 // 给 HomePage 加保护，只有登录用户才能访问。未登录用户访问 HomePage 时会被重定向到 LoginPage。
 import { Navigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '../auth/AuthContext'
 
 export default function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
