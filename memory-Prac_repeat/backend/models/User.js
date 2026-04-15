@@ -28,7 +28,7 @@ userSchema.pre('save', async function(next){
     }
 })
 
-// 验证密码 
+// 验证密码 ,自定义方法comparing
 //   bcrypt.compare — bcrypt 库的方法 
 //   bcrypt.hash('abc123', 10)           // bcrypt提供：加密
 //   bcrypt.compare('abc123', '加密后')  // bcrypt提供：对比

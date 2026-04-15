@@ -4,12 +4,25 @@ import cors from 'cors'
 //  读取 .env 文件，让 process.env.PORT这类变量可以用    
 import dotenv from 'dotenv'
 
-    dotenv.config()
+import authRoutes from './routes/auth.js'
+import deckRoutes from './routes/decks.js'
+import cardRoutes from './routes/cards.js'
+// import reviewRoutes from './routes/review.js'
+
+dotenv.config()
 
 const app = express()
+
 app.use(cors())
 // 让后端能读取请求体里的 JSON数据，不加这行 req.body 是 undefined 
 app.use(express.json())
+
+
+// Routes
+app.use('/api/auth', authRoutes)
+app.use('/api/decks', deckRoutes)
+app.use('/api/cards', cardRoutes)
+// app.use('/api/review', reviewRoutes)
 
 // 健康检查接口，用来确认后端服务器是否正常运行
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }))
