@@ -1,5 +1,5 @@
 {
-  "name": "pokemon_prac",
+  "name": "cs732-pokedex-demo",
   "version": "1.0.0",
   "private": true,
   "description": "Full-stack Pokedex demo application for CS732",
@@ -22,5 +22,8 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "react-router-dom": "^7.14.1"
+  }
 }
