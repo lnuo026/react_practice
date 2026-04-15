@@ -8,6 +8,7 @@
  import RegisterPage from './pages/RegisterPage'; 
  import HomePage from './pages/HomePage';
  import LoginPage from './pages/LoginPage';
+ import DeckPage from './pages/DeckPage';
 
 
 //  任何页面都需要知道"当前用户是谁"  ，所以AuthProvider 包裹整个 App，任何页面都能访问到用户信息。 localStorage
@@ -19,30 +20,44 @@ export default function App() {
       <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/flashcard" element={<FlashCard 
-          front="Hi" back="Hello!" />} />
-          <Route path="/deck" element={<DeckCard 
-          deck={{
-            title: "Sample Deck",
-            description: "This is a sample deck for testing."
+  
+          <Route 
+          path="/flashcard" 
+          element={<FlashCard 
+          front="Hi" back="Hello!" />} 
+          />
+          
+          <Route path="/deckcard" 
+          element={<DeckCard 
+            deck={{
+              description: "This is a sample deck for testing."
             }}
             onDelete={() => console.log('delete deckllll')}
-            />} />
+            />} 
+            />
           
+            <Route
+            path="/"
+            element= {
+              <ProtectedRoute>
+                <HomePage />
+              </ProtectedRoute>
+            }
+            />
+         
 
-
-
+            <Route 
+            path= "/deck/:deckId"
+            element={
+              <ProtectedRoute>
+              <DeckPage />
+              </ProtectedRoute>
           
-          <Route
-          path="/"
-          element= {
-            <ProtectedRoute>
-              <HomePage />
-            </ProtectedRoute>
-          }
+           } 
           />
+
           <Route 
-          path="/study" 
+          path="/study/:deckId" 
           element={
             <ProtectedRoute>
               <StudyPage />
@@ -51,10 +66,13 @@ export default function App() {
           } 
           />
 
+      {/*
+       * 是通配符，意思是"所有其他路径"。 */}
           <Route 
-          path="/about" 
+          path="/*" 
           element={<div>About Page</div>} 
           />
+
         </Routes>
         </BrowserRouter>
         </AuthProvider>
