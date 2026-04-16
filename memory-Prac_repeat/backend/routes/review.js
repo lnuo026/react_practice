@@ -46,28 +46,31 @@ router.post('/:cardId', auth, async (req, res) => {
     card.nextReviewDate = result.nextReviewDate
     await card.save()
 
-    // 第四步：调用 Groq AI（只有忘了才调用）
-//     let hint = null
-//     if (quality === 0 && process.env.GROQ_API_KEY) {
-//       try {
-//         const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
-//         const completion = await groq.chat.completions.create({
-//           model: 'llama-3.3-70b-versatile',
-//           messages: [
-//             {
-//               role: 'user',
-//               content: `I'm trying to memorize a flashcard but I keep forgetting it.
-// Front: "${card.front}"
-// Back: "${card.back}"
-// Please give me a short, creative memory tip or mnemonic (2-3 sentences) to help me remember the answer. Be concrete and vivid.`,
-//             },
-//           ],
-//         })
-//         hint = completion.choices[0].message.content
-//       } catch (groqErr) {
-//         console.error('Groq error:', groqErr.message)
-//       }
-//     }
+    // 第四步：调用 Groq AI（ 先定义 hint 为空，默认没有 AI 提示。
+    let hint = null
+    if (quality === 0 && process.env.GROQ_API_KEY) {
+      try {
+          //  创建 Groq 客户端，用你 .env 里的 Key 验证身份。
+        const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
+        // groq.chat.completions.create(  这里传入参数  ) 调用 Groq 的聊天接口，生成提示语
+        const completion = await groq.chat.completions.create({
+          model: 'llama-3.3-70b-versatile',
+          messages: [
+            {
+              role: 'user',
+              content: `I'm trying to memorize a flashcard but I keep forgetting it.
+                        Front: "${card.front}"
+                        Back: "${card.back}"
+                        Please give me a short, creative memory tip or mnemonic 
+                        (2-3 sentences) to help me remember the answer. Be concrete and vivid.`,
+            },
+          ],
+        })
+        hint = completion.choices[0].message.content
+      } catch (groqErr) {
+        console.error('Groq error:', groqErr.message)
+      }
+    }
 
     res.json({ card, hint, nextReviewDate: result.nextReviewDate })
   } catch (err) {

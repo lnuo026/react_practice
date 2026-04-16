@@ -7,7 +7,7 @@ import dotenv from 'dotenv'
 import authRoutes from './routes/auth.js'
 import deckRoutes from './routes/decks.js'
 import cardRoutes from './routes/cards.js'
-// import reviewRoutes from './routes/review.js'
+import reviewRoutes from './routes/review.js'
 
 dotenv.config()
 
@@ -22,7 +22,7 @@ app.use(express.json())
 app.use('/api/auth', authRoutes)
 app.use('/api/decks', deckRoutes)
 app.use('/api/cards', cardRoutes)
-// app.use('/api/review', reviewRoutes)
+app.use('/api/review', reviewRoutes)
 
 // 健康检查接口，用来确认后端服务器是否正常运行
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }))

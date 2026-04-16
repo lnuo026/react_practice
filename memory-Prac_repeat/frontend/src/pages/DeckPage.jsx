@@ -9,6 +9,8 @@ import { getCards, createCard, updateCard, deleteCard } from '../services/api'
 
 export default function DeckPage() {
     const { deckId } = useParams()
+    const [loading, setLoading] = useState(true)
+
     const [cards, setCards] = useState([])
     //正在编辑哪张卡
     const [editingId, setEditingId] = useState(null)
@@ -17,10 +19,12 @@ export default function DeckPage() {
     // // 是否 "正在" 保存 
     const [saving, setSaving] = useState(false)
     const [form, setForm] = useState({ front: '', back: '' })
+    const navigate = useNavigate()
 
     const fetchCards = async () => {
       const res = await getCards(deckId)
       setCards(res.data)
+      setLoading(false)
     }
 
     useEffect(() => {
@@ -28,16 +32,6 @@ export default function DeckPage() {
     }, [deckId])
 
 
-    
-    
-    const handleCreate = async (e) => {
-        e.preventDefault()
-        await createCard(deckId, form)
-        setForm({ front: '', back: '' })
-        fetchCards()
-    }
-    
-    
     // startEdit — 点编辑时发生什么  
     const startEdit = (card) => {                                    
         //把卡片内容填进表单

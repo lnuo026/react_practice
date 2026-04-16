@@ -16,15 +16,17 @@ export default function HomePage() {
 
 
     // fetchDecks 获取卡组
-    const fetchDecks = async () =>{
-        try {
-            // 发请求给后端,把数据存进状态
-            const res = await getDecks()
-            setDecks(res.data)
-        }catch(err){
-            console.error(err)
-        }
+    const fetchDecks = async () => {
+    try {
+         // 发请求给后端,把数据存进状态
+      const res = await getDecks()
+      setDecks(res.data)
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoading(false)
     }
+  }
 
     // 页面一加载自动执行
     // 页面打开 ，useEffect 触发 fetchDecks，发请求 GET /api/decks
@@ -42,7 +44,7 @@ export default function HomePage() {
   const handleCreate = async (e) => {
     e.preventDefault()                                             
     // 表单提交默认会刷新页面，这行阻止它
-    // setCreating(true)                     
+    setCreating(true)                     
     // 按钮变成 "Creating..."，同时禁用
     try {
       await createDeck(form)
@@ -77,7 +79,7 @@ export default function HomePage() {
     }
   }
  
-//   const totalDue = decks.reduce((sum, deck) => sum + (deck.dueCards || 0), 0)  
+  const totalDue = decks.reduce((sum, deck) => sum + (deck.dueCards || 0), 0)  
 
     return (
         <div className="max-w-4xl mx-auto px-4 py-8">
@@ -85,7 +87,7 @@ export default function HomePage() {
                 <div>
                 <h1 className="text-2xl font-bold text-gray-800">My Decks</h1>
                 <p className="text-sm text-gray-500 mt-1">
-                    Hello, {user?.username}
+                     Hello, {user?.username} — {totalDue > 0 ? `${totalDue} cards due today` : 'all caught up!'}
                 </p>
                 </div>
             <button
@@ -95,32 +97,63 @@ export default function HomePage() {
                 + New Deck
             </button>            
             </div>
+
+
             {showForm && (
-                <form onSubmit={handleCreate}>
-                    <input required value={form.title} onChange={e => setForm({...form, title: e.target.value})} placeholder="Deck title" />
-                    <input value={form.description} onChange={e => setForm({...form, description: e.target.value})} placeholder="Description" />
-                    <button type="submit">Create</button>
-                    <button type="button" onClick={() => setShowForm(false)}>Cancel</button>
-                </form>
-            )}
+        <form
+          onSubmit={handleCreate}
+          className="bg-white rounded-2xl shadow p-5 mb-6 flex flex-col gap-3 border border-indigo-100"
+        >
+          <h2 className="font-semibold text-gray-700">Create New Deck</h2>
+          <input
+            required
+            value={form.title}
+            onChange={(e) => setForm({ ...form, title: e.target.value })}
+            placeholder="Deck title"
+            className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+          />
+          <textarea
+            value={form.description}
+            onChange={(e) => setForm({ ...form, description: e.target.value })}
+            placeholder="Description (optional)"
+            rows={2}
+            className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 resize-none"
+          />
+          <div className="flex gap-2">
+            <button
+              type="submit"
+              disabled={creating}
+              className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition disabled:opacity-50"
+            >
+              {creating ? 'Creating...' : 'Create'}
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowForm(false)}
+              className="border border-gray-200 text-gray-600 px-4 py-2 rounded-lg text-sm hover:bg-gray-50 transition"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      )}
 
-            {loading ? (
-                <p className="text-center text-gray-400 mt-12">Loading decks...</p>
-            ) : decks.length === 0 ? (
-                <div className="text-center text-gray-400 mt-16">
-                <p className="text-lg">No decks yet.</p>
-                <p className="text-sm mt-1">Create your first deck to start studying!</p>
-                </div>
-            ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {decks.map((deck) => (
-                    <DeckCard key={deck._id} deck={deck} onDelete={handleDelete} />
-                ))}
-                </div>
-            )}
 
+      {loading ? (
+        <p className="text-center text-gray-400 mt-12">Loading decks...</p>
+      ) : decks.length === 0 ? (
+        <div className="text-center text-gray-400 mt-16">
+          <p className="text-lg">No decks yet.</p>
+          <p className="text-sm mt-1">Create your first deck to start studying!</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {decks.map((deck) => (
+            <DeckCard key={deck._id} deck={deck} onDelete={handleDelete} />
+          ))}
+        </div>
+      )}
+    </div>
 
-
-         </div>
-    );
+    )
 }
