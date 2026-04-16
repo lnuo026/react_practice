@@ -88,40 +88,111 @@ export default function DeckPage() {
       
 
     
-    return (
-        
-        <div className="max-w-3xl mx-auto px-4 py-8">
-            
-            <h1>Manage Cards</h1>
-            <form 
-            onSubmit={handleCreate}>
-            <input 
-            required 
-            value={form.front} 
-            onChange={e =>
-                setForm({...form, front: e.target.value})}
-                placeholder="Front" />
-            <input 
-            required 
-            value={form.back} 
-            onChange={e =>
-                setForm({...form, back: e.target.value})} 
-            placeholder="Back"
-            />
-            <button type="submit">Add Card</button>
-            </form>
-            {/* {cards.map(card => (
-                <div key={card._id}>
-                <p>{card.front} / {card.back}</p>
-                <button onClick={() =>
-                    handleDelete(card._id)}
-                >
-            Delete
-            </button>
-            </div>
-            ))} */}
+return (
+    <div className="max-w-3xl mx-auto px-4 py-8">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => navigate('/')}
+            className="text-gray-400 hover:text-gray-600 text-sm"
+          >
+            ← 🤓Back
+          </button>
+          <h1 className="text-2xl font-bold text-gray-800">Manage Cards</h1>
         </div>
-        )
+        <div className="flex gap-2">
+          <button
+            onClick={() => navigate(`/study/${deckId}`)}
+            className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition"
+          >
+            Study
+          </button>
+          <button
+            onClick={() => { setShowForm(true); setEditingId(null); setForm({ front: '', back: '' }) }}
+            className="border border-indigo-300 text-indigo-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-50 transition"
+          >
+            + Add Card
+          </button>
+        </div>
+      </div>
 
+      {showForm && (
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white rounded-2xl shadow p-5 mb-6 flex flex-col gap-3 border border-indigo-100"
+        >
+          <h2 className="font-semibold text-gray-700">{editingId ? 'Edit Card' : 'New Card'}</h2>
+          <textarea
+            required
+            value={form.front}
+            onChange={(e) => setForm({ ...form, front: e.target.value })}
+            placeholder="Front (question / word)"
+            rows={2}
+            className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 resize-none"
+          />
+          <textarea
+            required
+            value={form.back}
+            onChange={(e) => setForm({ ...form, back: e.target.value })}
+            placeholder="Back (answer / definition)"
+            rows={2}
+            className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 resize-none"
+          />
+          <div className="flex gap-2">
+            <button
+              type="submit"
+              disabled={saving}
+              className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition disabled:opacity-50"
+            >
+              {saving ? 'Saving...' : editingId ? 'Save Changes' : 'Add Card'}
+            </button>
+            <button
+              type="button"
+              onClick={resetForm}
+              className="border border-gray-200 text-gray-600 px-4 py-2 rounded-lg text-sm hover:bg-gray-50 transition"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      )}
 
+      {loading ? (
+        <p className="text-center text-gray-400 mt-12">Loading cards...</p>
+      ) : cards.length === 0 ? (
+        <p className="text-center text-gray-400 mt-12">No cards yet. Add your first card!</p>
+      ) : (
+        <div className="flex flex-col gap-3">
+          {cards.map((card) => (
+            <div
+              key={card._id}
+              className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex items-start justify-between gap-4"
+            >
+              <div className="flex-1 min-w-0">
+                <p className="font-medium text-gray-800 truncate">{card.front}</p>
+                <p className="text-sm text-gray-500 mt-1 truncate">{card.back}</p>
+                <p className="text-xs text-gray-300 mt-1">
+                  Next review: {new Date(card.nextReviewDate).toLocaleDateString()}
+                </p>
+              </div>
+              <div className="flex gap-2 shrink-0">
+                <button
+                  onClick={() => startEdit(card)}
+                  className="text-sm text-indigo-500 hover:text-indigo-700"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDelete(card._id)}
+                  className="text-sm text-red-400 hover:text-red-600"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
 }
